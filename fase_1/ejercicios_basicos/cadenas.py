@@ -1,4 +1,4 @@
-# Ingresar una oracion que puede tener letras mayusculas y minusculas. Contar la cantidad de vocales. Crear un strng con toda la oracion en minusculas.
+# Ingresar una oracion que puede tener letras mayusculas y minusculas. Contar la cantidad de vocales. Crear un string con toda la oracion en minusculas.
 
 oracion = input("Ingrese una oración: ").lower()
 vocales = "aeiou"
