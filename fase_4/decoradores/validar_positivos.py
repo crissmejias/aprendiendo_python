@@ -1,13 +1,13 @@
-def validador(func):
+def validar_positivos(func):
     def envoltura(*args,**kwargs):
-        resultado = func(*args,**kwargs)
-        n1,n2 = args
-        if n1 > 0 and n2 > 0:
+        if all(n > 0 for n in args):
+            resultado = func(*args,**kwargs)
             return  resultado
         else:
             raise ValueError("El número debe ser positivo")
     return envoltura
-@validador
+
+@validar_positivos
 def division(a,b):
     return a /b
 
