@@ -1,11 +1,24 @@
 from db import conectar_a_bd
 
-def listar_tareas():
+def listar_tareas(orden=None,direccion=None,completada=None):
     conn = None
     try:
         conn,cursor = conectar_a_bd("testing_tareas",False)
+        columnas_validas = {"id","titulo"}
+        direcciones ={"ASC","DESC"}
         sql = '''SELECT id,titulo,completada FROM tareas'''
-        cursor.execute(sql)
+        params = []
+        condiciones = []
+        if completada is not None:
+            condiciones.append("completada = %s")
+            params.append(completada)
+        if condiciones:
+            sql += " WHERE " + " AND ".join(condiciones)
+        if direccion is not None:
+            direccion = direccion.upper()
+        if orden in columnas_validas and direccion in direcciones:
+            sql += f" ORDER BY {orden} {direccion}"
+        cursor.execute(sql,params)
         datos = cursor.fetchall()
         lista_tareas =[]
         for dato in datos:
@@ -85,3 +98,24 @@ def eliminar_tarea(id):
     finally:
         if conn:
             conn.close()
+
+def obtener_stats():
+    conn = None
+    try:
+        conn, cursor = conectar_a_bd("testing_tareas",False)
+        sql = '''
+        SELECT 
+            COUNT(*) AS total_tareas,
+            COALESCE(SUM(CASE WHEN completada THEN 1 ELSE 0 END),0) AS completadas,
+            COALESCE(SUM (CASE WHEN NOT completada THEN 1 ELSE 0 END),0) AS pendientes
+        FROM tareas
+        '''
+        cursor.execute(sql)
+        stats = cursor.fetchone()
+        if stats is None:
+            return None
+        return stats
+    finally:
+        if conn:
+            conn.close()
+        

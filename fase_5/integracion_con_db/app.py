@@ -6,8 +6,11 @@ app.json.ensure_ascii = False
 
 @app.route("/tareas",methods=["GET"])
 def listar_tareas():
+    orden = request.args.get('orden')
+    completada = request.args.get('completada')
+    direccion = request.args.get('direccion')
     try:
-        lista_tareas = storage.listar_tareas()
+        lista_tareas = storage.listar_tareas(orden,direccion,completada)
         return lista_tareas,200
     except errors.Error as error:
         return jsonify({"error": f"{error}"}),500
@@ -53,6 +56,20 @@ def eliminar_tarea(id):
         if tarea_eliminada is None:
             return {"error":"La tarea no existe"},404
         return tarea_eliminada,204
+    except errors.Error as error:
+        return {"error":f"{error}"},500
+
+@app.route("/tareas/stats",methods=["GET"])
+def obtener_stats():
+    try:
+        stats = storage.obtener_stats()
+        if stats is None:
+            return {"error": "No existen tareas"},404
+        return jsonify({
+            "tareas" : stats[0],
+            "tareas_completadas": stats[1],
+            "tareas_pendientes": stats[2]
+        }),200
     except errors.Error as error:
         return {"error":f"{error}"},500
 
