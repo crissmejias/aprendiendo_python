@@ -8,7 +8,7 @@ def conectar_a_bd(bd,autocommit):
     database=bd,
     user="postgres",
     password=os.getenv("DB_PASSWORD"),
-    host="localhost",
+    host=os.getenv("DB_HOST","localhost"),
     port="5432"
     )
     if autocommit:
