@@ -49,4 +49,5 @@ def alterar_tabla():
             conn.close()
 
 if __name__ == "__main__":
+    crear_tabla()
     alterar_tabla()
