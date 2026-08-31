@@ -9,8 +9,10 @@ def listar_tareas():
     orden = request.args.get('orden')
     completada = request.args.get('completada')
     direccion = request.args.get('direccion')
+    fecha_inicio = request.args.get('fecha_inicio')
+    fecha_fin = request.args.get('fecha_fin')
     try:
-        lista_tareas = storage.listar_tareas(orden,direccion,completada)
+        lista_tareas = storage.listar_tareas(orden,direccion,completada,fecha_inicio,fecha_fin)
         return lista_tareas,200
     except errors.Error as error:
         return jsonify({"error": f"{error}"}),500

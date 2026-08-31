@@ -1,17 +1,27 @@
 from db import conectar_a_bd
 
-def listar_tareas(orden=None,direccion=None,completada=None):
+def listar_tareas(orden=None,
+                  direccion=None,
+                  completada=None,
+                  fecha_inicio=None,
+                  fecha_fin=None):
     conn = None
     try:
         conn,cursor = conectar_a_bd("testing_tareas",False)
-        columnas_validas = {"id","titulo"}
+        columnas_validas = {"id","titulo","fecha_creacion"}
         direcciones ={"ASC","DESC"}
-        sql = '''SELECT id,titulo,completada FROM tareas'''
         params = []
         condiciones = []
+        sql = '''SELECT id,titulo,completada,fecha_creacion FROM tareas'''
         if completada is not None:
             condiciones.append("completada = %s")
             params.append(completada)
+        if fecha_inicio is not None:
+            condiciones.append("fecha_creacion >= %s")
+            params.append(fecha_inicio)
+        if fecha_fin is not None:
+            condiciones.append("fecha_creacion < %s::date + INTERVAL '1 day'")
+            params.append(fecha_fin)
         if condiciones:
             sql += " WHERE " + " AND ".join(condiciones)
         if direccion is not None:
@@ -22,9 +32,11 @@ def listar_tareas(orden=None,direccion=None,completada=None):
         datos = cursor.fetchall()
         lista_tareas =[]
         for dato in datos:
-            tarea_dict = {"id": dato[0], 
+            tarea_dict = {
+                          "id": dato[0], 
                           "titulo": dato[1], 
-                          "completada": dato[2]
+                          "completada": dato[2],
+                          "fecha_creacion": dato[3]
                           }
             lista_tareas.append(tarea_dict)
         return lista_tareas
@@ -36,7 +48,7 @@ def traer_tarea(id):
     conn = None
     try:
         conn,cursor = conectar_a_bd("testing_tareas",False)
-        sql='''SELECT id, titulo, completada FROM tareas WHERE id = %s'''
+        sql='''SELECT id, titulo, completada,fecha_creacion FROM tareas WHERE id = %s'''
         cursor.execute(sql,(id,))
         datos = cursor.fetchone()
         if datos is None:
@@ -44,7 +56,8 @@ def traer_tarea(id):
         tarea_dict = {
                       "id" : datos[0],
                       "titulo": datos[1],
-                      "completada":datos[2]
+                      "completada":datos[2],
+                      "fecha_creacion": datos[3]
                       }
         return tarea_dict
     finally:

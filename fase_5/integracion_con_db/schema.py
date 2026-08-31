@@ -33,6 +33,20 @@ def eliminar_tabla():
             print("Se ha eliminado la tabla 'tareas'")
             conn.close()
 
+def alterar_tabla():
+    conn = None
+    try:
+        conn, cursor = conectar_a_bd("testing_tareas",False)
+        sql = '''ALTER TABLE tareas ADD COLUMN fecha_creacion TIMESTAMP DEFAULT NOW(),
+        ADD CONSTRAINT titulo_no_vacio CHECK (titulo <> '')'''
+        cursor.execute(sql)
+        conn.commit()
+        print("Se ha modificado la tabla 'tareas'")
+    except errors.Error:
+        print("Ocurrió un error en el servidor")
+    finally:
+        if conn:
+            conn.close()
+
 if __name__ == "__main__":
-    eliminar_tabla()
-    crear_tabla()
+    alterar_tabla()
